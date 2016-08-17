@@ -4,32 +4,36 @@ const output = audioContext.createGain();
 output.gain.value = 0.2;
 output.connect(audioContext.destination);
 
-// function createOsc(type, freq, mod) {
+let freq, amp;
 
-//     let osc = audioContext.createOscillator();
+let freqInput = document.getElementById("freq");
+let ampInput  = document.getElementById("amp");
 
-//     osc.type = type;
-//     osc.frequency.value = freq;
-//     mod.gain.connect(osc.frequency);
-    
-//     return osc;
-// }
+function getFreq() {
+    return freqInput.value;
+}
 
-// function createMod(type, freq, amnt) {
+function getAmp() {
+    return ampInput.value;
+}
 
-//     let osc = audioContext.createOscillator();
-//     let gain = audioContext.createGain();
-    
-//     osc.type = type;
-//     osc.frequency.value = freq;
-    
-//     gain.gain.value = amnt;
-//     osc.connect(gain);
-    
-//     return gain;
-// }
+freqInput.addEventListener("input", () => {
+    freq = parseInt(getFreq());
+
+    console.log(freq, amp);
+});
+
+ampInput.addEventListener("input", () => {
+    amp = parseInt(getAmp());
+
+    console.log(freq, amp);
+});
+
+// BE WARY OF INPUT VALUES IN CASE OF AM
+modulation(freq, amp, "AM");
 
 function createOsc(type, freq, amp) {
+    console.log("freq & amp: ", freq, amp);
     return {
         osc  : (function() {
 
@@ -73,6 +77,7 @@ function modulation(freq, amnt, typeofmod) {
 
         carrier = createOsc("sawtooth", 220, 0.5);
         carrier.connect();
+        
         mod = createOsc("sine", freq, amnt);
         mod.connect();        
        
@@ -101,8 +106,9 @@ function modulation(freq, amnt, typeofmod) {
     });
 }
 
-// BE WARY OF INPUT VALUES IN CASE OF AM
-modulation(10, 35, "AM");
+
+
+
 
 
 
