@@ -53,72 +53,63 @@ fmInput.addEventListener("change", function() {
 
 let frequency = 0, amplitude = 0;
 
-function modulation(typeofmod) {
+let freqInput = document.getElementById("freq");
+freqInput.addEventListener("change", () => {
+    frequency = freqInput.value;
+    console.log(freqInput.value);
+});
 
-    let carrier, mod;
+let ampInput = document.getElementById("amp");
+ampInput.addEventListener("change", () => {
+    amplitude = ampInput.value;
+    console.log(ampInput.value);
+});
 
-    carrier = createOsc("sawtooth", 220, 0.5);
-    carrier.connect();
+function modulation(car, mod, typeofmod) {
     
-    mod = createOsc("sine", frequency, amplitude);
+    car.connect();
     mod.connect();        
     
     if (typeofmod === "FM") {
 
-        mod.gain.connect(carrier.osc.frequency);
+        mod.gain.connect(car.osc.frequency);
         
     } else if (typeofmod === "AM") {
         
-        mod.gain.connect(carrier.gain.gain);
+        mod.gain.connect(car.gain.gain);
         
     }
 
-    carrier.connectToOutput();
+    car.connectToOutput();
+
+    return {
+        mod: mod,
+        car: car
+    };
 }
 
-let freqInput = document.getElementById("freq");
-let ampInput  = document.getElementById("amp");
-
-function getFreq() {
-    return freqInput.value;
-    console.log(freqInput.value);
-}
-
-function getAmp() {
-    return ampInput.value;
-    console.log(ampInput.value);
-}
-
-freqInput.addEventListener("input", () => {
-    frequency = parseInt(getFreq());
-
-    console.log(frequency, amplitude);
-});
-
-ampInput.addEventListener("input", () => {
-    amplitude = parseInt(getAmp());
-
-    console.log(frequency, amplitude);
-});
-
+let src;
 
 let startBtn = document.getElementById("start");
 
 startBtn.addEventListener("click", () => {
-    mod.osc.start(audioContext.currenTime);
-    carrier.osc.start(audioContext.currentTIme);
+    src = modulation(createOsc("sawtooth", 220, 0.3),
+                     createOsc("sine", frequency, amplitude),
+                     toggle);
+    
+    src.car.osc.start(audioContext.currenTime);
+    src.mod.osc.start(audioContext.currentTIme);
 });
 
 let stopBtn = document.getElementById("stop");
 
 stopBtn.addEventListener("click", () => {
-
-    mod.osc.stop(audioContext.currenTime);
-    carrier.osc.stop(audioContext.currentTime);
+    src.car.osc.stop(audioContext.currenTime);
+    src.mod.osc.stop(audioContext.currentTIme);
 });
 
 // BE WARY OF INPUT VALUES IN CASE OF AM
-modulation(toggle);
+
 
 
 
