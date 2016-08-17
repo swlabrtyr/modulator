@@ -5,7 +5,6 @@ output.gain.value = 0.2;
 output.connect(audioContext.destination);
 
 function createOsc(type, freq, amp) {
-    console.log("createOsc: ", freq, amp);
     return {
         osc  : (function() {
 
@@ -63,10 +62,13 @@ let ampInput = document.getElementById("amp");
 
 ampInput.addEventListener("change", () => {
     amplitude = ampInput.value;
+
+    // BE WARY OF INPUT VALUES IN CASE OF AM
     if (toggle === "AM" && parseInt(ampInput.value) > 1.0) {
         console.log("your ears kna sai sia");
         alert("Your amplitude value is too high! For the sake of your ears && speakers, use values less than 1.0!");
     }
+    
     console.log(ampInput.value);
 });
 
@@ -94,7 +96,6 @@ function modulation(car, mod, typeofmod) {
 }
 
 let src;
-
 let startBtn = document.getElementById("start");
 
 startBtn.addEventListener("click", () => {
@@ -113,7 +114,7 @@ stopBtn.addEventListener("click", () => {
     src.mod.osc.stop(audioContext.currentTIme);
 });
 
-// BE WARY OF INPUT VALUES IN CASE OF AM
+
 
 
 

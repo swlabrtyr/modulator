@@ -8,15 +8,23 @@
 
   <body>
     <h1>LFO</h1>
-    <span><strong>MOD TOGGLE</strong></span>
-    AM
-    <input type="radio" name="mod-toggle" id="am-on">
-    FM
-    <input type="radio" name="mod-toggle" id="fm-on" checked="true">
-    <input type="number" id="freq">
-    <input type="number" id="amp">
-    <button id="start">START</button>
-    <button id="stop">STOP</button>
+    <div id="toggles">
+      <span><strong>MOD TOGGLE</strong></span>
+      AM
+      <input type="radio" name="mod-toggle" id="am-on">
+      FM
+      <input type="radio" name="mod-toggle" id="fm-on" checked="true">
+    </div>
+    <div id="inputs">
+      <span>Frequency</span>
+      <input type="number" id="freq">
+      <span>Amplitude</span>
+      <input type="number" id="amp">
+    </div>
+    <div id="playback">
+      <button id="start">START</button>
+      <button id="stop">STOP</button>
+    </div>
     <script src="app.js"></script>
   </body>
 </html>
