@@ -9,12 +9,18 @@ let freq, amp;
 let freqInput = document.getElementById("freq");
 let ampInput  = document.getElementById("amp");
 
+freq = freqInput.value = parseInt("0");
+amp  = ampInput.value = parseInt("0");
+
+
 function getFreq() {
     return freqInput.value;
+    console.log(freqInput.value);
 }
 
 function getAmp() {
     return ampInput.value;
+    console.log(ampInput.value);
 }
 
 freqInput.addEventListener("input", () => {
@@ -30,10 +36,11 @@ ampInput.addEventListener("input", () => {
 });
 
 // BE WARY OF INPUT VALUES IN CASE OF AM
-modulation(freq, amp, "AM");
+
+modulation(freq, amp, "FM");
 
 function createOsc(type, freq, amp) {
-    console.log("freq & amp: ", freq, amp);
+    console.log("createOsc: ", freq, amp);
     return {
         osc  : (function() {
 
@@ -41,6 +48,7 @@ function createOsc(type, freq, amp) {
 
             osc.type = type;
             osc.frequency.value = freq;
+            // osc.frequency.value = 100;
 
             return osc;
         })(),
@@ -50,14 +58,13 @@ function createOsc(type, freq, amp) {
             let gain = audioContext.createGain();
 
             gain.gain.value = amp;
+            // gain.gain.value = 0.5;
 
             return gain;
         })(),
         
         connect : function() {
-
             this.osc.connect(this.gain);
-
         },
 
         connectToOutput : function () {
@@ -67,7 +74,7 @@ function createOsc(type, freq, amp) {
 }
 
 function modulation(freq, amnt, typeofmod) {
-
+    console.log("modulation: ", freq, amnt);
     let carrier;
     let mod;
     
