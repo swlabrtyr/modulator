@@ -120,8 +120,8 @@ stopBtn.addEventListener("click", () => {
 
 var canvas = document.querySelector('.visualizer');
 var myCanvas = canvas.getContext("2d");
-var WIDTH = 300;
-var HEIGHT = 300;
+var WIDTH = 600;
+var HEIGHT = 600;
 
 myCanvas.clearRect(0, 0, WIDTH, HEIGHT);
 
