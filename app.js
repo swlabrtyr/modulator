@@ -60,8 +60,13 @@ freqInput.addEventListener("change", () => {
 });
 
 let ampInput = document.getElementById("amp");
+
 ampInput.addEventListener("change", () => {
     amplitude = ampInput.value;
+    if (toggle === "AM" && parseInt(ampInput.value) > 1.0) {
+        console.log("your ears kna sai sia");
+        alert("Your amplitude value is too high! For the sake of your ears && speakers, use values less than 1.0!");
+    }
     console.log(ampInput.value);
 });
 
