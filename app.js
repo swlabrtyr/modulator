@@ -46,11 +46,11 @@ let toggle;
 let amInput = document.getElementById("am-on");
 let fmInput = document.getElementById("fm-on");
 
-amInput.addEventListener("input", function() {
+amInput.addEventListener("change", function() {
     toggle = "AM";
 });
 
-fmInput.addEventListener("input", function() {
+fmInput.addEventListener("change", function() {
     toggle = "FM";
 });
 
