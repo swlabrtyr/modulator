@@ -100,15 +100,15 @@ let startBtn = document.getElementById("start");
 let analyser = audioContext.createAnalyser();
 
 startBtn.addEventListener("click", () => {
-    draw();
     src = modulation(createOsc("sawtooth", 220, 0.3),
                      createOsc("sine", frequency, amplitude),
                      toggle);
     
     src.car.osc.start(audioContext.currenTime);
-    src.car.connect(analyser);
+    src.car.osc.connect(analyser);
     analyser.connect(audioContext.destination);
     src.mod.osc.start(audioContext.currentTIme);
+    draw();
 });
 
 let stopBtn = document.getElementById("stop");
@@ -124,6 +124,7 @@ var WIDTH = 300;
 var HEIGHT = 300;
 
 myCanvas.clearRect(0, 0, WIDTH, HEIGHT);
+
 var bufferLength = analyser.frequencyBinCount;
 var dataArray = new Uint8Array(bufferLength);
 
