@@ -4,41 +4,6 @@ const output = audioContext.createGain();
 output.gain.value = 0.2;
 output.connect(audioContext.destination);
 
-let freq, amp;
-
-let freqInput = document.getElementById("freq");
-let ampInput  = document.getElementById("amp");
-
-freq = freqInput.value = parseInt("0");
-amp  = ampInput.value = parseInt("0");
-
-
-function getFreq() {
-    return freqInput.value;
-    console.log(freqInput.value);
-}
-
-function getAmp() {
-    return ampInput.value;
-    console.log(ampInput.value);
-}
-
-freqInput.addEventListener("input", () => {
-    freq = parseInt(getFreq());
-
-    console.log(freq, amp);
-});
-
-ampInput.addEventListener("input", () => {
-    amp = parseInt(getAmp());
-
-    console.log(freq, amp);
-});
-
-// BE WARY OF INPUT VALUES IN CASE OF AM
-
-modulation(freq, amp, "FM");
-
 function createOsc(type, freq, amp) {
     console.log("createOsc: ", freq, amp);
     return {
@@ -73,11 +38,52 @@ function createOsc(type, freq, amp) {
     };
 }
 
+let frequency, amplitude;
+
+
+let toggle;
+
+let amInput = document.getElementById("am-on");
+let fmInput = document.getElementById("fm-on");
+
+amInput.addEventListener("input", function() {
+    toggle = "AM";
+});
+
+fmInput.addEventListener("input", function() {
+    toggle = "FM";
+});
+
 function modulation(freq, amnt, typeofmod) {
     console.log("modulation: ", freq, amnt);
-    let carrier;
-    let mod;
+
+    let carrier, mod;
+
+    let freqInput = document.getElementById("freq");
+    let ampInput  = document.getElementById("amp");
     
+    function getFreq() {
+        return freqInput.value;
+        console.log(freqInput.value);
+    }
+
+    function getAmp() {
+        return ampInput.value;
+        console.log(ampInput.value);
+    }
+
+    freqInput.addEventListener("input", () => {
+        frequency = parseInt(getFreq());
+
+        console.log(frequency, amplitude);
+    });
+
+    ampInput.addEventListener("input", () => {
+        amplitude = parseInt(getAmp());
+
+        console.log(frequency, amplitude);
+    });
+
     let startBtn = document.getElementById("start");
 
     startBtn.addEventListener("click", () => {
@@ -112,6 +118,13 @@ function modulation(freq, amnt, typeofmod) {
         carrier.osc.stop(audioContext.currentTime);
     });
 }
+
+// BE WARY OF INPUT VALUES IN CASE OF AM
+modulation(frequency, amplitude, "FM");
+
+
+
+
 
 
 
