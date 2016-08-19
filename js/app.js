@@ -1,6 +1,27 @@
 const audioContext = new AudioContext();
 const output = audioContext.createGain();
 
+window.keyboard = new AudioKeys({
+    polyphony: 3,
+    rows: 1,
+    priority: 'last'
+});
+
+let AKtoggle = document.getElementById('AKtoggle');
+let mute = true;
+
+AKtoggle.addEventListener('click', function() {
+    mute = !mute;
+    if (!mute) {
+        AKtoggle.innerHTML = "Press to stop";
+    }
+    else {
+        AKtoggle.innerHTML = "Click for AudioKeys";
+    }
+});
+
+let oscillators = {};
+
 output.gain.value = 0.2;
 output.connect(audioContext.destination);
 
@@ -118,6 +139,43 @@ stopBtn.addEventListener("click", () => {
     src.mod.osc.stop(audioContext.currentTIme);
 });
 
+let polySrc;
+
+keyboard.down(function(note) {
+    if(mute) return;
+
+    polySrc = modulation(createOsc("square", note.frequency, 0.3),
+                         createOsc("sine", note.frequency*3, amplitude),
+                         toggle);
+
+    // let gain = audioContext.createGain();
+    // gain.gain.value = 0.5;
+    
+    // polySrc.car.osc.connect(gain);
+    // gain.connect(output);
+    
+    polySrc.car.osc.start(audioContext.currentTime);
+    polySrc.mod.osc.start(audioContext.currentTime);
+    
+    oscillators[note.note] = {
+        oscillator: polySrc//,
+        // gain: gain
+    };
+});
+
+keyboard.up(function(note) {
+    if (mute) return;
+
+    if(oscillators[note.note]) {
+
+        polySrc.car.osc.stop(audioContext.currentTime + 0.8);
+        polySrc.mod.osc.stop(audioContext.currentTime + 0.8);
+        
+        delete oscillators[note.note];
+    }
+});
+
+// Visualizer
 var canvas = document.querySelector('.visualizer');
 var myCanvas = canvas.getContext("2d");
 var WIDTH = 600;
