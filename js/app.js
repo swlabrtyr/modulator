@@ -153,6 +153,12 @@ keyboard.down(function(note) {
     
     // polySrc.car.osc.connect(gain);
     // gain.connect(output);
+    let filter = audioContext.createBiquadFilter();
+
+    filter.type = "lowpass";
+    filter.frequency.value = 50;
+
+    polySrc.car.gain.connect(filter);
     
     polySrc.car.osc.start(audioContext.currentTime);
     polySrc.mod.osc.start(audioContext.currentTime);
