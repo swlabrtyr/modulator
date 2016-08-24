@@ -25,7 +25,7 @@ let oscillators = {};
 output.gain.value = 0.2;
 output.connect(audioContext.destination);
 
-function createOsc(type, freq, amp) {
+function createOsc(type, freq, amp, out) {
     return {
         osc  : (function() {
 
@@ -120,15 +120,22 @@ let src;
 let startBtn = document.getElementById("start");
 let analyser = audioContext.createAnalyser();
 
+let filter = audioContext.createBiquadFilter();
+filter.type = "lowpass";
+filter.frequency = 50;
+filter.connect(output);
+
 startBtn.addEventListener("click", () => {
-    src = modulation(createOsc("sawtooth", 220, 0.3),
+    src = modulation(createOsc("sawtooth", 220, 0.3, filter),
                      createOsc("sine", frequency, amplitude),
                      toggle);
     
     src.car.osc.start(audioContext.currenTime);
-    src.car.osc.connect(analyser);
-    analyser.connect(audioContext.destination);
     src.mod.osc.start(audioContext.currentTIme);
+
+    src.car.osc.connect(analyser);
+    
+    analyser.connect(audioContext.destination);    
     draw();
 });
 
@@ -147,26 +154,19 @@ keyboard.down(function(note) {
     polySrc = modulation(createOsc("square", note.frequency, 0.3),
                          createOsc("sine", note.frequency*3, amplitude),
                          toggle);
-
-    // let gain = audioContext.createGain();
-    // gain.gain.value = 0.5;
-    
-    // polySrc.car.osc.connect(gain);
-    // gain.connect(output);
-    let filter = audioContext.createBiquadFilter();
-
-    filter.type = "lowpass";
-    filter.frequency.value = 50;
-
-    polySrc.car.gain.connect(filter);
     
     polySrc.car.osc.start(audioContext.currentTime);
     polySrc.mod.osc.start(audioContext.currentTime);
     
     oscillators[note.note] = {
-        oscillator: polySrc//,
-        // gain: gain
+        oscillator: polySrc
     };
+    
+    polySrc.car.osc.connect(analyser);
+    
+    analyser.connect(audioContext.destination);    
+    
+    draw();
 });
 
 keyboard.up(function(note) {
