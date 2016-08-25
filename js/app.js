@@ -105,8 +105,6 @@ function modulation(car, mod, typeofmod) {
         
    }
 
-    car.connectToOutput();
-
     return {
         mod: mod,
         car: car
@@ -118,14 +116,14 @@ let analyser = audioContext.createAnalyser();
 
 let filter = audioContext.createBiquadFilter();
 filter.type = "lowpass";
-filter.frequency = 50;
+filter.frequency.value = 50;
 
 let startBtn = document.getElementById("start");
 
 startBtn.addEventListener("click", () => {
 
-    let carrier = createOsc("sawtooth", 440, 0.3, filter);
-    let modulator = createOsc("triangle", frequency, amplitude);
+    let carrier = createOsc("sawtooth", 440, 0.3);
+    let modulator = createOsc("triangle", /* rate */ frequency, /* depth */ amplitude);
 
     src = modulation(carrier, modulator, toggle);
 
@@ -147,6 +145,14 @@ stopBtn.addEventListener("click", () => {
     src.car.osc.stop(audioContext.currentTime);
     src.mod.osc.stop(audioContext.currentTIme);
 });
+
+
+
+/*
+
+AudioKeys
+
+*/
 
 let polySrc;
 
