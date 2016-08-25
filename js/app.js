@@ -25,15 +25,15 @@ let oscillators = {};
 output.gain.value = 0.2;
 output.connect(audioContext.destination);
 
-function createOsc(type, freq, amp, out) {
+function createOsc(type, freq, amp) {
     return {
-        osc  : (function() {
+        osc : (function() {
 
             let osc = audioContext.createOscillator();
-
+            
             osc.type = type;
             osc.frequency.value = freq;
-            // osc.frequency.value = 100;
+            console.log(freq);
 
             return osc;
         })(),
@@ -42,18 +42,14 @@ function createOsc(type, freq, amp, out) {
 
             let gain = audioContext.createGain();
 
+            // gain.gain.value = 0;
             gain.gain.value = amp;
-            // gain.gain.value = 0.5;
-
+            console.log(amp);
             return gain;
         })(),
         
         connect : function() {
             this.osc.connect(this.gain);
-        },
-
-        connectToOutput : function () {
-            this.gain.connect(output);
         }
     };
 }
@@ -74,15 +70,16 @@ fmInput.addEventListener("change", function() {
 let frequency = 0, amplitude = 0;
 
 let freqInput = document.getElementById("freq");
+
 freqInput.addEventListener("change", () => {
-    frequency = freqInput.value;
-    console.log(freqInput.value);
+    frequency = parseInt(freqInput.value);
+    console.log("freq value: ", freqInput.value);
 });
 
 let ampInput = document.getElementById("amp");
 
 ampInput.addEventListener("change", () => {
-    amplitude = ampInput.value;
+    amplitude = parseInt(ampInput.value);
 
     // BE WARY OF INPUT VALUES IN CASE OF AM
     if (toggle === "AM" && parseInt(ampInput.value) > 1.0) {
@@ -90,7 +87,7 @@ ampInput.addEventListener("change", () => {
         alert("Your amplitude value is too high! For the sake of your ears && speakers, use values less than 1.0!");
     }
     
-    console.log(ampInput.value);
+    console.log("amp value: ", ampInput.value);
 });
 
 function modulation(car, mod, typeofmod) {
@@ -106,7 +103,7 @@ function modulation(car, mod, typeofmod) {
         
         mod.gain.connect(car.gain.gain);
         
-    }
+   }
 
     car.connectToOutput();
 
@@ -117,24 +114,29 @@ function modulation(car, mod, typeofmod) {
 }
 
 let src;
-let startBtn = document.getElementById("start");
 let analyser = audioContext.createAnalyser();
 
 let filter = audioContext.createBiquadFilter();
 filter.type = "lowpass";
 filter.frequency = 50;
-filter.connect(output);
+
+let startBtn = document.getElementById("start");
 
 startBtn.addEventListener("click", () => {
-    src = modulation(createOsc("sawtooth", 220, 0.3, filter),
-                     createOsc("sine", frequency, amplitude),
-                     toggle);
-    
-    src.car.osc.start(audioContext.currenTime);
+
+    let carrier = createOsc("sawtooth", 440, 0.3, filter);
+    let modulator = createOsc("triangle", frequency, amplitude);
+
+    src = modulation(carrier, modulator, toggle);
+
+    src.car.osc.start(audioContext.currentTime);
     src.mod.osc.start(audioContext.currentTIme);
 
-    src.car.osc.connect(analyser);
+    src.car.gain.connect(filter);
+    filter.connect(output);
     
+    src.car.osc.connect(analyser);
+
     analyser.connect(audioContext.destination);    
     draw();
 });
@@ -142,7 +144,7 @@ startBtn.addEventListener("click", () => {
 let stopBtn = document.getElementById("stop");
 
 stopBtn.addEventListener("click", () => {
-    src.car.osc.stop(audioContext.currenTime);
+    src.car.osc.stop(audioContext.currentTime);
     src.mod.osc.stop(audioContext.currentTIme);
 });
 
@@ -172,7 +174,7 @@ keyboard.down(function(note) {
 keyboard.up(function(note) {
     if (mute) return;
 
-    if(oscillators[note.note]) {
+    if (oscillators[note.note]) {
 
         polySrc.car.osc.stop(audioContext.currentTime + 0.8);
         polySrc.mod.osc.stop(audioContext.currentTime + 0.8);
@@ -182,15 +184,15 @@ keyboard.up(function(note) {
 });
 
 // Visualizer
-var canvas = document.querySelector('.visualizer');
-var myCanvas = canvas.getContext("2d");
-var WIDTH = 600;
-var HEIGHT = 600;
+let canvas = document.querySelector('.visualizer');
+let myCanvas = canvas.getContext("2d");
+let WIDTH = 800;
+let HEIGHT = 600;
 
 myCanvas.clearRect(0, 0, WIDTH, HEIGHT);
 
-var bufferLength = analyser.frequencyBinCount;
-var dataArray = new Uint8Array(bufferLength);
+let bufferLength = analyser.frequencyBinCount;
+let dataArray = new Uint8Array(bufferLength);
 
 function draw() {
     let drawVisual = requestAnimationFrame(draw);
@@ -202,13 +204,13 @@ function draw() {
     myCanvas.strokeStyle = 'rgb(0, 0, 0)';
 
     myCanvas.beginPath();
-    var sliceWidth = WIDTH * 1.0 / bufferLength;
-    var x = 0;
+    let sliceWidth = WIDTH * 1.0 / bufferLength;
+    let x = 0;
     
-    for(var i = 0; i < bufferLength; i++) {
+    for(let i = 0; i < bufferLength; i++) {
         
-        var v = dataArray[i] / 128.0;
-        var y = v * HEIGHT/2;
+        let v = dataArray[i] / 128.0;
+        let y = v * HEIGHT/2;
 
         if(i === 0) {
             myCanvas.moveTo(x, y);
