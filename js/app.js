@@ -1,5 +1,10 @@
 const audioContext = new AudioContext();
 const output = audioContext.createGain();
+const canvas = document.querySelector('.visualizer');
+
+let myCanvas = canvas.getContext("2d");
+let WIDTH = 800;
+let HEIGHT = 600;
 
 window.keyboard = new AudioKeys({
     polyphony: 3,
@@ -123,7 +128,7 @@ let startBtn = document.getElementById("start");
 startBtn.addEventListener("click", () => {
 
     let carrier = createOsc("sawtooth", 440, 0.3);
-    let modulator = createOsc("triangle", /* rate */ frequency, /* depth */ amplitude);
+    let modulator = createOsc("triange", /* rate */ frequency, /* depth */ amplitude);
 
     src = modulation(carrier, modulator, toggle);
 
@@ -144,6 +149,8 @@ let stopBtn = document.getElementById("stop");
 stopBtn.addEventListener("click", () => {
     src.car.osc.stop(audioContext.currentTime);
     src.mod.osc.stop(audioContext.currentTIme);
+
+    myCanvas.clearRect(0, 0, WIDTH, HEIGHT);
 });
 
 
@@ -190,10 +197,6 @@ keyboard.up(function(note) {
 });
 
 // Visualizer
-let canvas = document.querySelector('.visualizer');
-let myCanvas = canvas.getContext("2d");
-let WIDTH = 800;
-let HEIGHT = 600;
 
 myCanvas.clearRect(0, 0, WIDTH, HEIGHT);
 
@@ -204,10 +207,10 @@ function draw() {
     let drawVisual = requestAnimationFrame(draw);
     analyser.getByteTimeDomainData(dataArray);
     
-    myCanvas.fillStyle = 'rgb(200, 200, 200)';
+    myCanvas.fillStyle = 'rgb(300, 200, 20)';
     myCanvas.fillRect(0, 0, WIDTH, HEIGHT);
     myCanvas.lineWidth = 2;
-    myCanvas.strokeStyle = 'rgb(0, 0, 0)';
+    myCanvas.strokeStyle = 'rgb(20, 30, 50)';
 
     myCanvas.beginPath();
     let sliceWidth = WIDTH * 1.0 / bufferLength;
