@@ -21,6 +21,20 @@
       <span>Amplitude</span>
       <input type="number" id="amp">
     </div>
+    <div class="waveform">carrier waveform:
+      <select class="waveform-select" onchange="carrierSelect = this.selectedIndex">
+        <option>Square
+        <option>Sawtooth
+        <option>Triangle
+        <option>Sine</select>
+    </div>
+    <div class="waveform">modulator waveform:
+      <select class="waveform-select" onchange="modSelect = this.selectedIndex">
+        <option>Square
+        <option>Sawtooth
+        <option>Triangle
+        <option>Sine</select>
+    </div>
     <div id="playback">
       <button id="AKtoggle">Select for AudioKeys</button>
       <button id="start">START</button>
