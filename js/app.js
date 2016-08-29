@@ -180,7 +180,7 @@ keyboard.down(function(note) {
     polySrc.car.osc.connect(analyser);
     
     analyser.connect(audioContext.destination);    
-    
+    console.log(polySrc);
     draw();
 });
 
@@ -194,6 +194,8 @@ keyboard.up(function(note) {
         
         delete oscillators[note.note];
     }
+    // polySrc.car.osc.stop(audioContext.currentTime + 0.8);
+    // polySrc.mod.osc.stop(audioContext.currentTime + 0.8);
 });
 
 // Visualizer
@@ -210,7 +212,7 @@ function draw() {
     myCanvas.fillStyle = 'rgb(300, 200, 20)';
     myCanvas.fillRect(0, 0, WIDTH, HEIGHT);
     myCanvas.lineWidth = 2;
-    myCanvas.strokeStyle = 'rgb(20, 30, 50)';
+    myCanvas.strokeStyle = 'rgb(20, 30, 80)';
 
     myCanvas.beginPath();
     let sliceWidth = WIDTH * 1.0 / bufferLength;
