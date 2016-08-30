@@ -125,32 +125,33 @@ filter.frequency.value = 50;
 
 let startBtn = document.getElementById("start");
 
-let carSelect;
-let modSelect;
-let carWaveform;
-let modWaveform;
+let carSelect = 0;
+let modSelect = 0;
+let carWaveform, modWaveform;
 
-if (carSelect === 0) {
-    carWaveform = "square";
-} else if (carSelect === 1) {
-    carWaveform = "sawtooth";
-} else if (carSelect === 2){
-    carWaveform = "triangle";
-} else {
-    carWaveform = "sine";
-}
 
-if (modSelect === 0) {
-    modWaveform = "square";
-} else if (modSelect === 1) {
-    modWaveform = "sawtooth";
-} else if (modSelect === 2) {
-    modWaveform = "triangle";
-} else {
-    modWaveform = "sine";
-}
 
 startBtn.addEventListener("click", () => {
+
+    if (carSelect === 0) {
+        carWaveform = "square";
+    } else if (carSelect === 1) {
+        carWaveform = "sawtooth";
+    } else if (carSelect === 2) {
+        carWaveform = "triangle";
+    } else {
+        carWaveform = "sine";
+    }
+
+    if (modSelect === 0) {
+        modWaveform = "square";
+    } else if (modSelect === 1) {
+        modWaveform = "sawtooth";
+    } else if (modSelect === 2) {
+        modWaveform = "triangle";
+    } else {
+        modWaveform = "sine";
+    }
     
     let carrier = createOsc(carWaveform, 440, 0.3);
     let modulator = createOsc(modWaveform, /* rate */ frequency, /* depth */ amplitude);
@@ -191,6 +192,25 @@ let polySrc;
 keyboard.down(function(note) {
     if(mute) return;
 
+    if (carSelect === 0) {
+        carWaveform = "square";
+    } else if (carSelect === 1) {
+        carWaveform = "sawtooth";
+    } else if (carSelect === 2) {
+        carWaveform = "triangle";
+    } else {
+        carWaveform = "sine";
+    }
+
+    if (modSelect === 0) {
+        modWaveform = "square";
+    } else if (modSelect === 1) {
+        modWaveform = "sawtooth";
+    } else if (modSelect === 2) {
+        modWaveform = "triangle";
+    } else {
+        modWaveform = "sine";
+    }
     polySrc = modulation(createOsc(carWaveform, note.frequency, 0.3),
                          createOsc(modWaveform, note.frequency*3, amplitude),
                          toggle);
