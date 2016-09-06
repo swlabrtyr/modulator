@@ -1,10 +1,12 @@
 const audioContext = new AudioContext();
 const output = audioContext.createGain();
 
-let myCanvas = document.querySelector('.visualizer').getContext("2d");
-let WIDTH = 800;
-let HEIGHT = 600;
-let analyser = audioContext.createAnalyser();
+const canvas = document.querySelector('.visualizer');
+canvas.style.margin = 'auto';
+const canvasContext = canvas.getContext("2d");
+const WIDTH = document.body.clientWidth;
+const HEIGHT = document.body.clientHeight - 300;
+const analyser = audioContext.createAnalyser();
 
 window.keyboard = new AudioKeys({
     polyphony: 3,
@@ -121,7 +123,7 @@ let src;
 // not working
 let filter = audioContext.createBiquadFilter();
 filter.type = "lowpass";
-filter.frequency.value = 50;
+filter.frequency.value = 5000;
 
 let startBtn = document.getElementById("start");
 
@@ -165,7 +167,7 @@ startBtn.addEventListener("click", () => {
     src.car.osc.connect(analyser);
 
     analyser.connect(audioContext.destination);    
-    draw(myCanvas, 'rgb(2, 3, 4)', 'rgb(20, 30, 40)');
+    draw();
 });
 
 let stopBtn = document.getElementById("stop");
@@ -174,7 +176,7 @@ stopBtn.addEventListener("click", () => {
     src.car.osc.stop(audioContext.currentTime);
     src.mod.osc.stop(audioContext.currentTIme);
 
-    myCanvas.clearRect(0, 0, WIDTH, HEIGHT);
+    canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
 });
 
 
@@ -214,18 +216,21 @@ keyboard.down(function(note) {
                          createOsc(modWaveform, note.frequency*3, amplitude),
                          toggle);
     
-    polySrc.car.osc.start(audioContext.currentTime);
-    polySrc.mod.osc.start(audioContext.currentTime);
+    // polySrc.car.osc.start(audioContext.currentTime);
+    // polySrc.mod.osc.start(audioContext.currentTime);
     
     oscillators[note.note] = {
         oscillator: polySrc
     };
-    
-    polySrc.car.osc.connect(analyser);
-    
+    oscillators[note.note].oscillator.car.osc.start(audioContext.currentTime);
+    oscillators[note.note].oscillator.mod.osc.start(audioContext.currentTime);
+    // polySrc.car.osc.connect(analyser);
+
+    oscillators[note.note].oscillator.car.osc.connect(filter);
+    filter.connect(analyser);
     analyser.connect(audioContext.destination);    
-    console.log(polySrc);
-    draw(myCanvas, 'rgb(2, 3, 4)', 'rgb(20, 30, 40)');
+
+    draw();
 });
 
 keyboard.up(function(note) {
@@ -234,8 +239,6 @@ keyboard.up(function(note) {
     if (oscillators[note.note]) {
 
         console.log(oscillators[note.note]);
-        // polySrc.car.osc.stop(audioContext.currentTime + 0.8);
-        // polySrc.mod.osc.stop(audioContext.currentTime + 0.8);
 
         oscillators[note.note].oscillator.car.osc.stop(audioContext.currentTime + 0.8);
         oscillators[note.note].oscillator.mod.osc.stop(audioContext.currentTime + 0.8);
@@ -246,40 +249,41 @@ keyboard.up(function(note) {
 
 // Visualizer
 
-myCanvas.clearRect(0, 0, WIDTH, HEIGHT);
+canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
 
 let bufferLength = analyser.frequencyBinCount;
 let dataArray = new Uint8Array(bufferLength);
 
-function draw(canvas, fill, stroke) {
+function draw() {
     let drawVisual = requestAnimationFrame(draw);
     analyser.getByteTimeDomainData(dataArray);
-    console.log(canvas);
-    canvas.fillStyle = fill;
-    canvas.fillRect(0, 0, WIDTH, HEIGHT);
-    canvas.lineWidth = 2;
-    canvas.strokeStyle = stroke;
 
-    canvas.beginPath();
+    canvasContext.fillStyle = 'rgb(100, 20, 159)';
+    canvasContext.fillRect(0, 0, WIDTH, HEIGHT);
+    canvasContext.lineWidth = 2;
+    canvasContext.strokeStyle = 'rgb(30, 200, 100)';
+
+    canvasContext.beginPath();
     let sliceWidth = WIDTH * 1.0 / bufferLength;
     let x = 0;
     
-    for(let i = 0; i < bufferLength; i++) {
+    for (let i = 0; i < bufferLength; i++) {
         
         let v = dataArray[i] / 128.0;
         let y = v * HEIGHT/2;
 
-        if(i === 0) {
-            canvas.moveTo(x, y);
+        if (i === 0) {
+            canvasContext.moveTo(x, y);
         } else {
-            canvas.lineTo(x, y);
+            canvasContext.lineTo(x, y);
         }
 
         x += sliceWidth;
     };
     
-    canvas.lineTo(canvas.width, canvas.height/2);
-    canvas.stroke();
+    canvasContext.lineTo(canvas.width, canvas.height/2);
+    canvasContext.stroke();
 };
+
 
 
