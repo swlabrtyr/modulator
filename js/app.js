@@ -274,7 +274,7 @@ keyboard.down(function(note) {
     filter.connect(analyser);
     analyser.connect(audioContext.destination);    
 
-    draw();
+    // draw();
 });
 
 keyboard.up(function(note) {

@@ -1,11 +1,28 @@
+body {
+    font-family: "Roboto";
+}
+
 #toggles {
     margin-bottom:20px;
 }
 
 #inputs {
+    display: flex;
+    flex-direction: column;
     margin-bottom:20px;
 }
 
 #playback {
     margin-bottom:20px;
+}
+
+.waveform {
+    display: flex;
+    flex-direction: column;
+}
+
+.waveform select {
+    width: 150px;
+    height: 10px;
+    margin: 10px;
 }
