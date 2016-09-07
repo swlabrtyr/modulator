@@ -125,7 +125,7 @@ let filter = audioContext.createBiquadFilter();
 // reverb
 let soundSrc, IRBuffer;
 let convolver = audioContext.createConvolver();
-let url = 'https://github.com/swlabrtyr/ir_samles/blob/master/Large%20Long%20Echo%20Hall.wav';
+let url = 'https://raw.githubusercontent.com/swlabrtyr/modulator/gh-pages/Large%20Wide%20Echo%20Hall.wav';
 
 function createCORSRequest(method, url){
     var xhr = new XMLHttpRequest();
