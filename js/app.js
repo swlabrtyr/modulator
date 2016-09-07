@@ -5,7 +5,7 @@ const canvas = document.querySelector('.visualizer');
 canvas.style.margin = 'auto';
 const canvasContext = canvas.getContext("2d");
 const WIDTH = document.body.clientWidth;
-const HEIGHT = document.body.clientHeight - 300;
+const HEIGHT = document.body.clientHeight - 200;
 const analyser = audioContext.createAnalyser();
 
 window.keyboard = new AudioKeys({
@@ -137,6 +137,7 @@ function createCORSRequest(method, url){
     } else {
         xhr = null;
     }
+    console.log(xhr);
     return xhr;
 }
 
@@ -187,55 +188,80 @@ let carSelect = 0;
 let modSelect = 0;
 let carWaveform, modWaveform;
 
-startBtn.addEventListener("click", () => {
-
-    if (carSelect === 0) {
+function waveformSelection(car, mod) {
+    this.car = carSelect;
+    this.mod = modSelect;
+    
+    if (car === 0) {
         carWaveform = "square";
-    } else if (carSelect === 1) {
+    } else if (car=== 1) {
         carWaveform = "sawtooth";
-    } else if (carSelect === 2) {
+    } else if (car=== 2) {
         carWaveform = "triangle";
     } else {
         carWaveform = "sine";
     }
 
-    if (modSelect === 0) {
+    if (mod === 0) {
         modWaveform = "square";
-    } else if (modSelect === 1) {
+    } else if (mod === 1) {
         modWaveform = "sawtooth";
-    } else if (modSelect === 2) {
+    } else if (mod === 2) {
         modWaveform = "triangle";
     } else {
         modWaveform = "sine";
     }
+}
+
+// startBtn.addEventListener("click", () => {
+
+//     if (carSelect === 0) {
+//         carWaveform = "square";
+//     } else if (carSelect === 1) {
+//         carWaveform = "sawtooth";
+//     } else if (carSelect === 2) {
+//         carWaveform = "triangle";
+//     } else {
+//         carWaveform = "sine";
+//     }
+
+//     if (modSelect === 0) {
+//         modWaveform = "square";
+//     } else if (modSelect === 1) {
+//         modWaveform = "sawtooth";
+//     } else if (modSelect === 2) {
+//         modWaveform = "triangle";
+//     } else {
+//         modWaveform = "sine";
+//     }
     
-    let carrier = createOsc(carWaveform, 440, 0.3);
-    let modulator = createOsc(modWaveform, /* rate */ frequency, /* depth */ amplitude);
+//     let carrier = createOsc(carWaveform, 440, 0.3);
+//     let modulator = createOsc(modWaveform, /* rate */ frequency, /* depth */ amplitude);
 
-    src = modulation(carrier, modulator, toggle);
+//     src = modulation(carrier, modulator, toggle);
     
-    src.car.osc.start(audioContext.currentTime);
-    src.mod.osc.start(audioContext.currentTIme);
+//     src.car.osc.start(audioContext.currentTime);
+//     src.mod.osc.start(audioContext.currentTIme);
 
-    src.car.gain.connect(distortion);
-    distortion.connect(filter);
-    filter.connect(convolver);
-    convolver.connect(output);
+//     // src.car.gain.connect(distortion);
+//     // distortion.connect(filter);
+//     // filter.connect(convolver);
+//     // convolver.connect(output);
     
-    src.car.osc.connect(analyser);
+//     src.car.osc.connect(analyser);
 
-    analyser.connect(audioContext.destination);    
-    draw();
-});
+//     // analyser.connect(audioContext.destination);    
+//     draw();
+// });
 
-let stopBtn = document.getElementById("stop");
+// let stopBtn = document.getElementById("stop");
 
-stopBtn.addEventListener("click", () => {
-    src.car.osc.stop(audioContext.currentTime);
-    src.mod.osc.stop(audioContext.currentTIme);
+// stopBtn.addEventListener("click", () => {
+//     src.car.osc.stop(audioContext.currentTime);
+//     src.mod.osc.stop(audioContext.currentTIme);
 
-    canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
-});
+//     canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
+// });
 
 
 
@@ -273,20 +299,19 @@ keyboard.down(function(note) {
     polySrc = modulation(createOsc(carWaveform, note.frequency, 0.3),
                          createOsc(modWaveform, note.frequency*3, amplitude),
                          toggle);
-    
-    // polySrc.car.osc.start(audioContext.currentTime);
-    // polySrc.mod.osc.start(audioContext.currentTime);
-    
+
     oscillators[note.note] = {
         oscillator: polySrc
     };
+    
     oscillators[note.note].oscillator.car.osc.start(audioContext.currentTime);
     oscillators[note.note].oscillator.mod.osc.start(audioContext.currentTime);
-    // polySrc.car.osc.connect(analyser);
 
-    oscillators[note.note].oscillator.car.osc.connect(filter);
+    oscillators[note.note].oscillator.car.gain.connect(filter);
+    // distortion.connect(filter);    
     filter.connect(analyser);
-    analyser.connect(audioContext.destination);    
+    // convolver.connect(analyser);
+    analyser.connect(output);
 
     draw();
 });
@@ -316,14 +341,15 @@ function draw() {
     let drawVisual = requestAnimationFrame(draw);
     analyser.getByteTimeDomainData(dataArray);
 
-    canvasContext.fillStyle = 'rgb(100, 20, 159)';
-    canvasContext.fillRect(0, 0, WIDTH, HEIGHT);
-    canvasContext.lineWidth = 2;
-    canvasContext.strokeStyle = 'rgb(30, 200, 100)';
-
+    canvasContext.fillStyle = 'rgb(1, 234, 159)';
+    canvasContext.fillRect(10, 10, WIDTH, HEIGHT);
+    canvasContext.createRadialGradient(10, 10, 0, 100, 100, 0);
+    canvasContext.lineWidth = 7;
+    canvasContext.strokeStyle = 'rgb(255, 168, 100)';
     canvasContext.beginPath();
-    let sliceWidth = WIDTH * 1.0 / bufferLength;
-    let x = 0;
+
+    let sliceWidth = WIDTH / 1.5 / bufferLength/12;
+    let x = 50;
     
     for (let i = 0; i < bufferLength; i++) {
         
@@ -336,11 +362,12 @@ function draw() {
             canvasContext.lineTo(x, y);
         }
 
-        x += sliceWidth;
+        x += sliceWidth * 3;
     };
     
     canvasContext.lineTo(canvas.width, canvas.height/2);
     canvasContext.stroke();
+    canvasContext.clearRect();
 };
 
 
