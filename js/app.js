@@ -120,10 +120,32 @@ function modulation(car, mod, typeofmod) {
 
 let src;
 
-// not working
 let filter = audioContext.createBiquadFilter();
+
+// reverb
+let soundSrc, IRBuffer;
+let convolver = audioContext.createConvolver();
+let ajaxRequest = new XMLHttpRequest();
+
+ajaxRequest.open('GET', 'https://raw.githubusercontent.com/swlabrtyr/ir_samles/master/Conic%20Long%20Echo%20Hall.wav', true);
+
+ajaxRequest.responseType = 'arraybuffer';
+ajaxRequest.onload = () => {
+    let audioData = ajaxRequest.response;
+    audioContext.decodeAudioData(audioData, (buffer) => {
+        console.log(buffer);
+        IRBuffer = buffer;
+        soundSrc = audioContext.createBufferSource();
+        soundSrc.buffer = IRBuffer;
+    }, (e) => {'error decoding data' + e.err});
+};
+
+ajaxRequest.send();
+
+convolver.buffer = IRBuffer;
+console.log(convolver);
 filter.type = "lowpass";
-filter.frequency.value = 5000;
+filter.frequency.value = 1500;
 
 let startBtn = document.getElementById("start");
 
@@ -162,7 +184,8 @@ startBtn.addEventListener("click", () => {
     src.mod.osc.start(audioContext.currentTIme);
 
     src.car.gain.connect(filter);
-    filter.connect(output);
+    filter.connect(convolver);
+    convolver.connect(output);
     
     src.car.osc.connect(analyser);
 
