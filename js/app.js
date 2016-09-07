@@ -126,24 +126,44 @@ let filter = audioContext.createBiquadFilter();
 let soundSrc, IRBuffer;
 let convolver = audioContext.createConvolver();
 let ajaxRequest = new XMLHttpRequest();
+let url = 'https://github.com/swlabrtyr/ir_samles/blob/master/Large%20Long%20Echo%20Hall.wav';
 
-ajaxRequest.open('GET', 'https://raw.githubusercontent.com/swlabrtyr/ir_samles/master/Conic%20Long%20Echo%20Hall.wav', true);
+ajaxRequest.open('GET', url, true);
 
 ajaxRequest.responseType = 'arraybuffer';
 ajaxRequest.onload = () => {
     let audioData = ajaxRequest.response;
     audioContext.decodeAudioData(audioData, (buffer) => {
-        console.log(buffer);
         IRBuffer = buffer;
         soundSrc = audioContext.createBufferSource();
         soundSrc.buffer = IRBuffer;
-    }, (e) => {'error decoding data' + e.err});
+    }, (e) => {
+       console.log('error decoding data' + e.err);
+    });
 };
 
 ajaxRequest.send();
-
 convolver.buffer = IRBuffer;
-console.log(convolver);
+
+//distortion
+let distortion = audioContext.createWaveShaper();
+
+function makeDistortionCurve(amount) {
+  var k = typeof amount === 'number' ? amount : 50,
+    n_samples = 44100,
+    curve = new Float32Array(n_samples),
+    deg = Math.PI / 180,
+    i = 0,
+    x;
+  for ( ; i < n_samples; ++i ) {
+    x = i * 2 / n_samples - 1;
+    curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
+  }
+  return curve;
+};
+
+distortion.curve = makeDistortionCurve(400);
+
 filter.type = "lowpass";
 filter.frequency.value = 1500;
 
@@ -183,7 +203,8 @@ startBtn.addEventListener("click", () => {
     src.car.osc.start(audioContext.currentTime);
     src.mod.osc.start(audioContext.currentTIme);
 
-    src.car.gain.connect(filter);
+    src.car.gain.connect(distortion);
+    distortion.connect(filter);
     filter.connect(convolver);
     convolver.connect(output);
     
